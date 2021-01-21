@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Digital Invoce</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    {% if messages %}
+        <ul class="msg">
+            {% for message in messages %}
+                <li {% if message.tags %} class="{{message.tages}}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <div class="container">
+      <div class="login-page">
+        <div class="form" >
+            <form class="register-form" method="POST" action="{% url 'register' %}">
+            {% csrf_token %}
+            <input type="text" name ='name' placeholder="name"/>
+            <input type="email" name='email' placeholder="email address"/>
+            <input type="password" name='password' placeholder="password"/>
+            <button type="submit">create</button>
+            <p class="message">Already registered? <a href="#">Sign In</a></p>
+            </form>
+            <form class="login-form" method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+            <input type="email" name='email' placeholder="username"/>
+            <input type="password" name='password' placeholder="password"/>
+            <button type="submit">login</button>
+            <p class="message">Not registered? <a href="#">Create an account</a></p>
+            </form>
+        </div>
+        </div>
+      </div>
+    </div>
+    <script>
+        $('.message a').click(function(){
+        $('form').animate({height: "toggle", opacity: "toggle"}, "slow");
+        });
+        //$('.msg').hide('slow');
+    </script>
+  </body>
+</html>

@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Details</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+      integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div class="custom-file-upload" id="mydiv">
+      <form
+        id="myform"
+        enctype="multipart/form-data"
+        method="POST"
+        novalidate=""
+      >
+        {% csrf_token %}
+        <input type="file" id="file" name="myfile" />
+        <button type="submit" id="btn-sub">Upload</button>
+      </form>
+      <p id="err" style="display: none; color: red;"></p>
+    </div>
+    <div class="table-div">
+      <table border="3">
+        <thead>
+          <tr>
+            <th>S.N.</th>
+            <th>Buyer</th>
+            <th>Seller</th>
+            <th>Invoce No.</th>
+            <th>Date</th>
+            <th>Item</th>
+            <th>Digitalized</th>
+          </tr>
+        </thead>
+        <tbody id="mybody"></tbody>
+      </table>
+    </div>
+    <script>
+      $("#myform").submit((e) => {
+        e.preventDefault();
+        var data = new FormData($("form").get(0));
+        $.ajax({
+          type: "POST",
+          url: '{% url "uploadfile" %}',
+          data: data,
+          cache: false,
+          processData: false,
+          contentType: false,
+          success: (respone) => {
+            console.log(respone.message);
+            if(respone.message=="File exists"){
+                document.getElementById('file').value="";
+                let err = document.getElementById('err');
+                err.innerHTML="File already exists."
+                err.style.display="block";
+                setTimeout(function (){err.style.display="none"},2000);
+            }else{
+                document.getElementById("mybody").innerHTML="";
+                digiList();
+            }
+          },
+        });
+        return false;
+      });
+      function digiList() {
+        console.log("featching.......");
+        fetch("http://127.0.0.1:8000/digi-list/")
+          .then((response) => response.json())
+          .then((data) => {
+            if (data) {
+              console.log(data);
+              let tbody = document.getElementById("mybody");
+              for (let i = 0; i<=data.length-1; i++) {
+              let tr = document.createElement("tr");
+                tr.innerHTML =
+                  "<td>" +
+                  (i + 1) +
+                  "</td><td>" +
+                  data[i].buyer +
+                  "</td><td>" +
+                  data[i].seller +
+                  "</td><td>" +
+                  data[i].invoice_number +
+                  "</td><td>" +
+                  data[i].invoice_date +
+                  "</td><td>" +
+                  data[i].items+
+                  "</td><td>" +
+                  data[i].digitalized+
+                  "</td>";
+                tbody.appendChild(tr);
+              }
+              document.getElementById('file').value="";
+            }
+          });
+      }
+      digiList();
+    </script>
+  </body>
+</html>
